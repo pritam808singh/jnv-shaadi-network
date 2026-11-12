@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JNV Gajner (Bikaner) • 2016 Batch Shaadi & Leave Tracker</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Royal Rajasthani / Marwari Wedding Aesthetic -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        maroon: {
+                            DEFAULT: '#6b0f1a',
+                            dark: '#4a0810',
+                            light: '#8f1624'
+                        },
+                        gold: {
+                            DEFAULT: '#d4af37',
+                            light: '#f5e6b3',
+                            dark: '#a6841b'
+                        },
+                        cream: '#fdfbf7'
+                    },
+                    fontFamily: {
+                        serif: ['Cinzel', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #fdfbf7;
+            background-image: radial-gradient(#d4af37 0.55px, transparent 0.55px), radial-gradient(#6b0f1a 0.55px, #fdfbf7 0.55px);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            background-attachment: fixed;
+        }
+        .royal-border {
+            border: 2px solid #d4af37;
+            box-shadow: 0 10px 25px -5px rgba(107, 15, 26, 0.08), 0 0 0 1px rgba(212, 175, 55, 0.25);
+        }
+        .royal-gradient {
+            background: linear-gradient(135deg, #6b0f1a 0%, #4a0810 100%);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #d4af37;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="font-sans text-stone-800 min-h-screen flex flex-col">
+
+    <!-- Top Royal Header -->
+    <header class="royal-gradient text-white border-b-4 border-gold shadow-xl relative overflow-hidden">
+        <div class="max-w-6xl mx-auto px-4 py-7 text-center relative z-10">
+            <div class="inline-flex flex-wrap items-center justify-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-400/50 text-emerald-300 text-xs font-bold tracking-wide mb-3 shadow">
+                <span id="liveDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="liveStatusBadge">Connected to Live Cloud DB (jnv-2016-shaadi)</span>
+            </div>
+            <h1 class="font-serif text-2xl sm:text-4xl font-bold tracking-wide text-white drop-shadow">
+                💍 JNV Gajner (Bikaner) • 2016 Batch Shaadi & Baraat Tracker
+            </h1>
+            <p class="mt-1.5 text-gold-light text-xs sm:text-base font-medium max-w-3xl mx-auto">
+                Navodayan Shaadi Portal — Add upcoming marriages, represent your JNV House, plan carpools, and calculate leaves together!
+            </p>
+        </div>
+    </header>
+
+    <!-- Summary Bar -->
+    <section class="max-w-6xl w-full mx-auto px-4 -mt-5 relative z-20">
+        <div class="bg-white rounded-2xl royal-border p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 items-center">
+            
+            <!-- Stat 1: Total Upcoming -->
+            <div class="flex items-center gap-3.5 p-3 rounded-xl bg-amber-50/70 border border-gold/30">
+                <div class="w-11 h-11 rounded-xl royal-gradient text-gold flex items-center justify-center text-lg shrink-0 shadow">
+                    <i class="fa-solid fa-calendar-days"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500">Upcoming Weddings</p>
+                    <p id="statTotalUpcoming" class="text-xl font-extrabold text-maroon">0 Listed</p>
+                </div>
+            </div>
+
+            <!-- Stat 2: Next Shaadi Countdown -->
+            <div class="flex items-center gap-3.5 p-3 rounded-xl bg-amber-50/70 border border-gold/30">
+                <div class="w-11 h-11 rounded-xl royal-gradient text-gold flex items-center justify-center text-lg shrink-0 shadow">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                </div>
+                <div class="overflow-hidden">
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500">Next Baraat</p>
+                    <p id="statNextCountdown" class="text-sm font-extrabold text-maroon truncate">None scheduled</p>
+                </div>
+            </div>
+
+            <!-- Stat 3: Total Batchmates Attending -->
+            <div class="flex items-center gap-3.5 p-3 rounded-xl bg-amber-50/70 border border-gold/30">
+                <div class="w-11 h-11 rounded-xl royal-gradient text-gold flex items-center justify-center text-lg shrink-0 shadow">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-wider text-stone-500">Total Baraatis Ready</p>
+                    <p id="statTotalRsvps" class="text-xl font-extrabold text-maroon">0 Attending</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-col gap-2">
+                <button onclick="openWeddingForm()" class="w-full py-2.5 px-4 rounded-xl royal-gradient text-gold font-bold text-xs sm:text-sm hover:opacity-95 transition flex items-center justify-center gap-2 shadow-md">
+                    <i class="fa-solid fa-plus-circle"></i> + Add Wedding Event
+                </button>
+                <button onclick="shareFullListOnWhatsApp()" class="w-full py-2 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs transition flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-brands fa-whatsapp text-sm"></i> Share Full List on WhatsApp
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- JNV House Shaadi & Baraat Leaderboard -->
+    <section class="max-w-6xl w-full mx-auto px-4 mt-4">
+        <div class="bg-white/95 rounded-2xl border border-gold/50 p-4 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-xs font-extrabold uppercase tracking-wider text-maroon flex items-center gap-1.5">
+                        <i class="fa-solid fa-trophy text-gold-dark"></i> JNV Gajner 2016 House Leaderboard (Baraat & Shaadi Tally)
+                    </span>
+                </div>
+                <span class="text-[11px] text-stone-500 font-medium">Click any House below to filter weddings!</span>
+            </div>
+            <div id="houseLeaderboard" class="grid grid-cols-2 lg:grid-cols-4 gap-2.5">
+                <!-- Populated dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Container -->
+    <main class="max-w-6xl w-full mx-auto px-4 py-5 flex-1">
+
+        <!-- Filter & Sync Toolbar -->
+        <div class="bg-white/95 rounded-2xl border border-gold/40 p-3.5 mb-6 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="fetchWeddingsFromFirebase(false, true)" class="text-xs font-bold text-maroon bg-amber-50 hover:bg-amber-100 border border-gold/50 px-3.5 py-1.5 rounded-full transition flex items-center gap-1.5">
+                    <i id="refreshSpinner" class="fa-solid fa-arrows-rotate"></i> Sync Latest Data
+                </button>
+                <span id="lastSyncedTime" class="text-[11px] text-stone-500 font-medium">Smart Sync Active (Won't interrupt typing)</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+                <div class="relative flex-1 sm:w-52">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 text-xs"></i>
+                    <input type="text" id="searchInput" oninput="renderWeddings()" placeholder="Search name, nickname, city..."
+                        class="w-full pl-8 pr-3 py-1.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-xs">
+                </div>
+                <select id="houseFilterSelect" onchange="renderWeddings()" class="px-3 py-1.5 rounded-xl border border-stone-300 text-xs font-semibold text-stone-700 outline-none focus:border-maroon bg-white">
+                    <option value="all">🏠 All JNV Houses</option>
+                    <option value="Aravali">🟥 Aravali House</option>
+                    <option value="Nilgiri">🟦 Nilgiri House</option>
+                    <option value="Shivalik">🟩 Shivalik House</option>
+                    <option value="Udaigiri">🟨 Udaigiri House</option>
+                </select>
+                <select id="filterSelect" onchange="renderWeddings()" class="px-3 py-1.5 rounded-xl border border-stone-300 text-xs font-semibold text-stone-700 outline-none focus:border-maroon bg-white">
+                    <option value="all">All Weddings</option>
+                    <option value="upcoming">Upcoming Only</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Add / Edit Wedding Event Form -->
+        <div id="weddingFormContainer" class="hidden mb-8 bg-white rounded-2xl royal-border overflow-hidden shadow-xl">
+            <div class="royal-gradient px-5 py-4 flex justify-between items-center text-white">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-scroll text-gold"></i>
+                    <h2 id="formHeading" class="font-serif text-base sm:text-xl font-bold">Add Upcoming Wedding Event</h2>
+                </div>
+                <button type="button" onclick="closeWeddingForm()" class="text-gold-light hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <form id="weddingForm" class="p-5 sm:p-6 space-y-4">
+                <input type="hidden" id="editWeddingId" value="">
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="sm:col-span-1">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-maroon mb-1">Batchmate / Couple Name *</label>
+                        <input type="text" id="coupleName" required placeholder="e.g., Rahul Weds Priya"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-maroon focus:ring-2 focus:ring-maroon/20 outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-maroon mb-1">JNV House *</label>
+                        <select id="jnvHouse" class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-sm bg-white font-semibold">
+                            <option value="Aravali">🟥 Aravali House</option>
+                            <option value="Nilgiri">🟦 Nilgiri House</option>
+                            <option value="Shivalik">🟩 Shivalik House</option>
+                            <option value="Udaigiri">🟨 Udaigiri House</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-maroon mb-1">JNV Nickname / Hostel Memory</label>
+                        <input type="text" id="jnvNickname" placeholder="e.g., Mess Prefect / Volleyball Star"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-maroon mb-1">Main Shaadi Date *</label>
+                        <input type="date" id="weddingDate" required
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-maroon mb-1">Venue / City *</label>
+                        <input type="text" id="venueCity" required placeholder="e.g., Bikaner, Jodhpur, Nokha, Jaipur"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-maroon mb-1">Contact Number / Added By *</label>
+                        <input type="text" id="contactBy" required placeholder="e.g., Ramesh (98290-XXXXX)"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-maroon mb-1">Haldi / Sangeet / Reception Schedule (Optional)</label>
+                        <input type="text" id="preWeddingEvents" placeholder="e.g., Haldi: 14th 11AM • Sangeet: 14th 8PM • Baraat: 15th 7PM"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-maroon mb-1">Leave Suggestion & Stay Note *</label>
+                        <input type="text" id="leaveNote" required placeholder="e.g., Apply 2 days CL/PL. Hostel gang hotel booked near station!"
+                            class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-sm">
+                    </div>
+                </div>
+
+                <div class="pt-2 flex justify-end gap-3">
+                    <button type="button" onclick="closeWeddingForm()" class="px-5 py-2.5 rounded-xl border border-stone-300 text-stone-600 font-semibold text-sm hover:bg-stone-100">
+                        Cancel
+                    </button>
+                    <button type="submit" id="saveWeddingBtn" class="px-6 py-2.5 rounded-xl royal-gradient text-gold font-bold text-sm shadow-md hover:opacity-95 flex items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> <span id="saveWeddingBtnText">Save to Live Cloud DB</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Error / Rules Notice -->
+        <div id="dbErrorBanner" class="hidden mb-6 p-4 rounded-2xl bg-red-50 border-2 border-red-300 text-red-900 text-xs sm:text-sm">
+            <p class="font-bold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Firebase Database Permission Notice:</p>
+            <p id="dbErrorText" class="mt-1">Please make sure your Firebase Realtime Database Rules have <code>".read": true</code> and <code>".write": true</code>.</p>
+        </div>
+
+        <!-- Wedding Cards Grid -->
+        <div id="weddingsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Populated dynamically -->
+        </div>
+
+    </main>
+
+    <!-- Dedicated Baraat Squad & Carpool RSVP Modal (Never loses focus or text!) -->
+    <div id="rsvpModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl royal-border max-w-md w-full overflow-hidden shadow-2xl">
+            <div class="royal-gradient px-5 py-4 flex justify-between items-center text-white">
+                <div>
+                    <span class="text-[10px] uppercase tracking-widest text-gold block font-bold">👳‍♂️ Join the Baraat Squad</span>
+                    <h3 id="rsvpModalTitle" class="font-serif font-bold text-lg text-white">Mark Your Attendance</h3>
+                </div>
+                <button type="button" onclick="closeRsvpModal()" class="text-gold-light hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            <form id="rsvpModalForm" class="p-5 space-y-4">
+                <input type="hidden" id="rsvpModalWeddingId" value="">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-maroon mb-1">Your Name *</label>
+                    <input type="text" id="rsvpModalName" required placeholder="e.g., Sunil Bishnoi"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-maroon mb-1">Your JNV House</label>
+                        <select id="rsvpModalHouse" class="w-full px-3 py-2.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-xs font-bold bg-white">
+                            <option value="Aravali">🟥 Aravali</option>
+                            <option value="Nilgiri">🟦 Nilgiri</option>
+                            <option value="Shivalik">🟩 Shivalik</option>
+                            <option value="Udaigiri">🟨 Udaigiri</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-maroon mb-1">Leave / Plan Status</label>
+                        <select id="rsvpModalStatus" class="w-full px-3 py-2.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-xs font-bold bg-white">
+                            <option value="Pakka Joining 🔥">Pakka Joining 🔥</option>
+                            <option value="Leave Applied 📄">Leave Applied 📄</option>
+                            <option value="Trying for Leave 🤞">Trying for Leave 🤞</option>
+                            <option value="Direct Venue 🚗">Direct Venue 🚗</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-maroon mb-1">Carpool / Travel Route (Optional)</label>
+                    <input type="text" id="rsvpModalTravel" placeholder="e.g., Going by car from Jaipur on 14th, 3 seats free!"
+                        class="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-sm">
+                </div>
+                <div class="flex gap-2 pt-2">
+                    <button type="button" onclick="closeRsvpModal()" class="flex-1 py-2.5 rounded-xl border border-stone-300 text-stone-700 font-semibold text-sm">Cancel</button>
+                    <button type="submit" id="rsvpModalSubmitBtn" class="flex-1 py-2.5 rounded-xl royal-gradient text-gold font-bold text-sm shadow-md">
+                        + Add Me to Baraat
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl border-2 border-red-200 max-w-sm w-full p-6 text-center shadow-2xl">
+            <div class="w-12 h-12 rounded-full bg-red-100 text-red-700 flex items-center justify-center mx-auto mb-3 text-xl">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <h3 class="font-serif font-bold text-lg text-stone-900">Delete This Wedding Event?</h3>
+            <p class="text-xs text-stone-500 mt-1 mb-5">This will permanently delete this wedding from the shared Firebase database for everyone in the group.</p>
+            <div class="flex gap-2 justify-center">
+                <button type="button" onclick="closeDeleteModal()" class="flex-1 py-2.5 rounded-xl border border-stone-300 text-stone-700 font-semibold text-sm">Cancel</button>
+                <button type="button" id="confirmDeleteBtn" class="flex-1 py-2.5 rounded-xl bg-red-700 hover:bg-red-800 text-white font-semibold text-sm">Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 hidden bg-stone-900 text-white px-4 py-3 rounded-xl shadow-xl border border-gold/40 text-sm flex items-center gap-2.5">
+        <i class="fa-solid fa-circle-check text-gold"></i>
+        <span id="toastMsg">Saved to Cloud Database!</span>
+    </div>
+
+    <footer class="mt-12 py-6 border-t border-gold/30 text-center text-xs text-stone-500 bg-white/60">
+        Made with ❤️ for <strong>Jawahar Navodaya Vidyalaya Gajner (Bikaner)</strong> • 2016 Batch Passouts • <em>Hum Navodayan Hain!</em>
+    </footer>
+
+    <script>
+        // ============================================================================
+        // HARDCODED LIVE FIREBASE REALTIME DATABASE URL (UNCHANGED)
+        // ============================================================================
+        const FIREBASE_DB_URL = "https://jnv-2016-shaadi-default-rtdb.firebaseio.com";
+        const WEDDINGS_ENDPOINT = `${FIREBASE_DB_URL}/weddings.json`;
+
+        let weddingsData = {}; 
+        let lastDataSignature = ""; // Prevents unnecessary DOM rebuilds when data hasn't changed
+        let draftInputs = {};       // Preserves typed RSVP text per card ID so it NEVER disappears!
+        let draftHouseInputs = {};  // Preserves selected House per card ID
+        let pendingDeleteId = null;
+        let isSaving = false;
+
+        const HOUSE_META = {
+            Aravali:  { emoji: '🟥', bg: 'bg-red-50', border: 'border-red-300', text: 'text-red-800', pill: 'bg-red-600 text-white' },
+            Nilgiri:  { emoji: '🟦', bg: 'bg-blue-50', border: 'border-blue-300', text: 'text-blue-800', pill: 'bg-blue-600 text-white' },
+            Shivalik: { emoji: '🟩', bg: 'bg-emerald-50', border: 'border-emerald-300', text: 'text-emerald-800', pill: 'bg-emerald-600 text-white' },
+            Udaigiri: { emoji: '🟨', bg: 'bg-amber-50', border: 'border-amber-300', text: 'text-amber-800', pill: 'bg-amber-500 text-stone-950' }
+        };
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3200);
+        }
+
+        function setConnectionStatus(ok, message) {
+            const dot = document.getElementById('liveDot');
+            const badge = document.getElementById('liveStatusBadge');
+            const errBanner = document.getElementById('dbErrorBanner');
+
+            if (ok) {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse";
+                badge.textContent = message || "Connected to Live Cloud DB (jnv-2016-shaadi)";
+                errBanner.classList.add('hidden');
+            } else {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-rose-400";
+                badge.textContent = message || "Cloud DB Sync Issue — Retrying...";
+            }
+        }
+
+        // Check if user is actively typing in an inline RSVP input inside the cards grid
+        function isUserTypingInCardInput() {
+            const active = document.activeElement;
+            if (!active) return false;
+            const grid = document.getElementById('weddingsGrid');
+            return grid && grid.contains(active) && (active.tagName === 'INPUT' || active.tagName === 'SELECT' || active.tagName === 'TEXTAREA');
+        }
+
+        // Normalize attendee item (supports both legacy string format and new rich object format)
+        function normalizeAttendee(att) {
+            if (typeof att === 'string') {
+                return { name: att, house: '', status: 'Pakka Joining 🔥', travel: '' };
+            }
+            if (att && typeof att === 'object' && att.name) {
+                return {
+                    name: String(att.name).trim(),
+                    house: att.house || '',
+                    status: att.status || 'Pakka Joining 🔥',
+                    travel: att.travel || ''
+                };
+            }
+            return null;
+        }
+
+        // ============================================================================
+        // DIRECT FIREBASE REST API CALLS (GET, PUT, DELETE)
+        // ============================================================================
+        async function fetchWeddingsFromFirebase(silent = true, forceRender = false) {
+            if (isSaving) return;
+            // If background polling happens while user is typing in an inline input, skip disrupting them!
+            if (silent && isUserTypingInCardInput() && !forceRender) {
+                return;
+            }
+
+            const spinner = document.getElementById('refreshSpinner');
+            if (!silent && spinner) spinner.classList.add('fa-spin');
+
+            try {
+                const res = await fetch(`${WEDDINGS_ENDPOINT}?t=${Date.now()}`, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' },
+                    cache: 'no-store'
+                });
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
+                const raw = await res.json();
+                const normalized = {};
+
+                if (raw && typeof raw === 'object') {
+                    Object.entries(raw).forEach(([key, val]) => {
+                        if (val && typeof val === 'object' && val.coupleName) {
+                            const id = val.id || key;
+                            const rawAttendees = Array.isArray(val.attendees)
+                                ? val.attendees
+                                : (val.attendees && typeof val.attendees === 'object' ? Object.values(val.attendees) : []);
+
+                            normalized[id] = {
+                                id,
+                                coupleName: val.coupleName || '',
+                                jnvHouse: val.jnvHouse || 'Aravali',
+                                jnvNickname: val.jnvNickname || '',
+                                weddingDate: val.weddingDate || '',
+                                venueCity: val.venueCity || '',
+                                preWeddingEvents: val.preWeddingEvents || '',
+                                leaveNote: val.leaveNote || '',
+                                contactBy: val.contactBy || '',
+                                attendees: rawAttendees.map(normalizeAttendee).filter(Boolean),
+                                reactions: val.reactions && typeof val.reactions === 'object'
+                                    ? {
+                                        naagin: Number(val.reactions.naagin || 0),
+                                        buffet: Number(val.reactions.buffet || 0),
+                                        leave: Number(val.reactions.leave || 0)
+                                    }
+                                    : { naagin: 0, buffet: 0, leave: 0 },
+                                updatedAt: val.updatedAt || 0
+                            };
+                        }
+                    });
+                }
+
+                const newSignature = JSON.stringify(normalized);
+                weddingsData = normalized;
+                setConnectionStatus(true, "Connected to Live Cloud DB (jnv-2016-shaadi)");
+
+                const nowStr = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                document.getElementById('lastSyncedTime').textContent = `Synced: ${nowStr}`;
+
+                // Only re-render DOM if the cloud data actually changed or forced
+                if (forceRender || newSignature !== lastDataSignature) {
+                    lastDataSignature = newSignature;
+                    renderWeddings();
+                }
+            } catch (err) {
+                console.error("Firebase GET Error:", err);
+                setConnectionStatus(false, "Database Connection Error");
+                const errBanner = document.getElementById('dbErrorBanner');
+                errBanner.classList.remove('hidden');
+            } finally {
+                if (!silent && spinner) setTimeout(() => spinner.classList.remove('fa-spin'), 400);
+            }
+        }
+
+        async function saveSingleWeddingToFirebase(weddingObj) {
+            isSaving = true;
+            try {
+                const itemUrl = `${FIREBASE_DB_URL}/weddings/${encodeURIComponent(weddingObj.id)}.json`;
+                const res = await fetch(itemUrl, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(weddingObj)
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                weddingsData[weddingObj.id] = weddingObj;
+                lastDataSignature = JSON.stringify(weddingsData);
+                setConnectionStatus(true, "Connected to Live Cloud DB (jnv-2016-shaadi)");
+                renderWeddings();
+                return true;
+            } catch (err) {
+                console.error("Firebase PUT Error:", err);
+                showToast("Error saving to Firebase. Check database rules!");
+                return false;
+            } finally {
+                isSaving = false;
+            }
+        }
+
+        async function deleteSingleWeddingFromFirebase(weddingId) {
+            isSaving = true;
+            try {
+                const itemUrl = `${FIREBASE_DB_URL}/weddings/${encodeURIComponent(weddingId)}.json`;
+                const res = await fetch(itemUrl, {
+                    method: 'DELETE'
+                });
+
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                delete weddingsData[weddingId];
+                lastDataSignature = JSON.stringify(weddingsData);
+                setConnectionStatus(true, "Connected to Live Cloud DB (jnv-2016-shaadi)");
+                renderWeddings();
+                return true;
+            } catch (err) {
+                console.error("Firebase DELETE Error:", err);
+                showToast("Error deleting from Firebase.");
+                return false;
+            } finally {
+                isSaving = false;
+            }
+        }
+
+        // ============================================================================
+        // DATE, LEAVE CALCULATOR & FORMATTING HELPERS
+        // ============================================================================
+        function getDaysDifference(dateStr) {
+            if (!dateStr) return 999;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const target = new Date(dateStr + "T00:00:00");
+            const diffMs = target - today;
+            return Math.round(diffMs / (1000 * 60 * 60 * 24));
+        }
+
+        function formatIndianDate(dateStr) {
+            if (!dateStr) return "";
+            const d = new Date(dateStr + "T00:00:00");
+            if (isNaN(d.getTime())) return dateStr;
+            return d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        function getSmartLeaveAdvice(dateStr) {
+            if (!dateStr) return "";
+            const d = new Date(dateStr + "T00:00:00");
+            if (isNaN(d.getTime())) return "";
+            const dayIdx = d.getDay(); // 0 Sun .. 6 Sat
+            const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            const dayName = dayNames[dayIdx];
+
+            const prevDay = new Date(d);
+            prevDay.setDate(d.getDate() - 1);
+            const nextDay = new Date(d);
+            nextDay.setDate(d.getDate() + 1);
+
+            const fmtShort = (dt) => dt.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+
+            if (dayIdx === 0 || dayIdx === 6) {
+                return `🎉 ${dayName} Shaadi! Weekend advantage — Only need leave around ${fmtShort(prevDay)} to ${fmtShort(nextDay)}.`;
+            } else if (dayIdx === 5 || dayIdx === 1) {
+                return `✨ Long Weekend Chance (${dayName})! Take 1–2 days CL (${fmtShort(prevDay)} - ${fmtShort(nextDay)}) & enjoy with batch!`;
+            }
+            return `📝 Mid-Week (${dayName}) Shaadi — Apply 2-3 days CL/PL (${fmtShort(prevDay)} to ${fmtShort(nextDay)}) in advance!`;
+        }
+
+        function escapeHtml(str) {
+            if (!str) return "";
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        function saveInlineDraft(weddingId, val) {
+            draftInputs[weddingId] = val;
+        }
+
+        function saveInlineHouseDraft(weddingId, val) {
+            draftHouseInputs[weddingId] = val;
+        }
+
+        function filterByHouseQuick(houseName) {
+            const sel = document.getElementById('houseFilterSelect');
+            if (!sel) return;
+            sel.value = (sel.value === houseName) ? 'all' : houseName;
+            renderWeddings();
+        }
+
+        // ============================================================================
+        // RENDER HOUSE LEADERBOARD, WEDDING CARDS & SUMMARY
+        // ============================================================================
+        function renderHouseLeaderboard(allList) {
+            const container = document.getElementById('houseLeaderboard');
+            if (!container) return;
+
+            const currentHouseFilter = document.getElementById('houseFilterSelect')?.value || 'all';
+            const stats = {
+                Aravali:  { weddings: 0, baraatis: 0 },
+                Nilgiri:  { weddings: 0, baraatis: 0 },
+                Shivalik: { weddings: 0, baraatis: 0 },
+                Udaigiri: { weddings: 0, baraatis: 0 }
+            };
+
+            allList.forEach(w => {
+                const h = w.jnvHouse && stats[w.jnvHouse] ? w.jnvHouse : 'Aravali';
+                stats[h].weddings += 1;
+                (w.attendees || []).forEach(att => {
+                    const obj = normalizeAttendee(att);
+                    if (obj && obj.house && stats[obj.house]) {
+                        stats[obj.house].baraatis += 1;
+                    } else {
+                        stats[h].baraatis += 1;
+                    }
+                });
+            });
+
+            container.innerHTML = Object.keys(HOUSE_META).map(house => {
+                const meta = HOUSE_META[house];
+                const st = stats[house];
+                const isSelected = currentHouseFilter === house;
+                return `
+                    <button type="button" onclick="filterByHouseQuick('${house}')"
+                        class="text-left p-2.5 rounded-xl border transition flex items-center justify-between ${meta.bg} ${meta.border} ${isSelected ? 'ring-2 ring-maroon shadow-md scale-[1.01]' : 'hover:opacity-90'}">
+                        <div>
+                            <p class="text-xs font-extrabold ${meta.text} flex items-center gap-1">
+                                <span>${meta.emoji}</span> ${house} House
+                            </p>
+                            <p class="text-[11px] text-stone-600 font-semibold mt-0.5">
+                                💍 ${st.weddings} Shaadi • 👳‍♂️ ${st.baraatis} Baraatis
+                            </p>
+                        </div>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/80 ${meta.text} border ${meta.border}">
+                            ${isSelected ? 'Filtered ✓' : 'View'}
+                        </span>
+                    </button>
+                `;
+            }).join('');
+        }
+
+        function renderWeddings() {
+            const grid = document.getElementById('weddingsGrid');
+            const searchQuery = (document.getElementById('searchInput')?.value || '').trim().toLowerCase();
+            const filterMode = document.getElementById('filterSelect')?.value || 'all';
+            const houseFilter = document.getElementById('houseFilterSelect')?.value || 'all';
+
+            const allList = Object.values(weddingsData).sort((a, b) => new Date(a.weddingDate) - new Date(b.weddingDate));
+
+            // Update House Leaderboard
+            renderHouseLeaderboard(allList);
+
+            // Summary Stats
+            const upcomingList = allList.filter(w => getDaysDifference(w.weddingDate) >= 0);
+            document.getElementById('statTotalUpcoming').textContent = `${upcomingList.length} Listed`;
+
+            const totalRsvps = allList.reduce((sum, w) => sum + (Array.isArray(w.attendees) ? w.attendees.length : 0), 0);
+            document.getElementById('statTotalRsvps').textContent = `${totalRsvps} Attending`;
+
+            if (upcomingList.length > 0) {
+                const next = upcomingList[0];
+                const d = getDaysDifference(next.weddingDate);
+                document.getElementById('statNextCountdown').textContent = d === 0
+                    ? `Today! (${next.coupleName})`
+                    : `In ${d} Days (${next.coupleName})`;
+            } else {
+                document.getElementById('statNextCountdown').textContent = "None scheduled";
+            }
+
+            // Filter
+            const filtered = allList.filter(item => {
+                const diff = getDaysDifference(item.weddingDate);
+                if (filterMode === 'upcoming' && diff < 0) return false;
+                if (filterMode === 'completed' && diff >= 0) return false;
+                if (houseFilter !== 'all' && (item.jnvHouse || 'Aravali') !== houseFilter) return false;
+                if (searchQuery) {
+                    const attNames = (item.attendees || []).map(a => `${a.name} ${a.travel || ''}`).join(' ');
+                    const hay = `${item.coupleName} ${item.jnvNickname || ''} ${item.jnvHouse || ''} ${item.venueCity} ${item.leaveNote} ${item.contactBy} ${attNames}`.toLowerCase();
+                    if (!hay.includes(searchQuery)) return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full bg-white rounded-2xl royal-border p-8 sm:p-12 text-center shadow-sm">
+                        <div class="w-16 h-16 rounded-full bg-amber-100 text-maroon flex items-center justify-center mx-auto mb-4 text-2xl shadow-inner">
+                            <i class="fa-solid fa-champagne-glasses"></i>
+                        </div>
+                        <h3 class="font-serif text-xl sm:text-2xl font-bold text-maroon">
+                            ${allList.length === 0 ? 'No Weddings Added Yet!' : 'No Matching Weddings Found'}
+                        </h3>
+                        <p class="text-stone-600 text-xs sm:text-sm max-w-md mx-auto mt-1.5 mb-6">
+                            ${allList.length === 0 
+                                ? 'Our JNV Bikaner 2016 live database is ready. Click "+ Add Wedding Event" below to add the first upcoming marriage!'
+                                : 'Try clearing your search box or changing the House / Date filter.'}
+                        </p>
+                        <button onclick="openWeddingForm()" class="px-6 py-3 rounded-xl royal-gradient text-gold font-bold text-sm shadow-md hover:opacity-95 transition">
+                            <i class="fa-solid fa-plus-circle mr-1.5"></i> + Add Wedding Event
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(item => {
+                const diff = getDaysDifference(item.weddingDate);
+                let badgeHtml = '';
+                if (diff < 0) {
+                    badgeHtml = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-stone-200 text-stone-600">Completed ✨</span>`;
+                } else if (diff === 0) {
+                    badgeHtml = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-600 text-white animate-bounce">Today! 🥁</span>`;
+                } else if (diff <= 15) {
+                    badgeHtml = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-rose-600 text-white shadow">${diff} Days Left 🔥</span>`;
+                } else {
+                    badgeHtml = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-maroon border border-gold/50">${diff} Days Left ⏳</span>`;
+                }
+
+                const houseName = item.jnvHouse && HOUSE_META[item.jnvHouse] ? item.jnvHouse : 'Aravali';
+                const houseMeta = HOUSE_META[houseName];
+                const attendees = Array.isArray(item.attendees) ? item.attendees.map(normalizeAttendee).filter(Boolean) : [];
+                const reactions = item.reactions || { naagin: 0, buffet: 0, leave: 0 };
+                const draftText = draftInputs[item.id] || '';
+                const draftHouse = draftHouseInputs[item.id] || houseName;
+                const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.venueCity + ' Rajasthan')}`;
+                const smartLeaveTip = getSmartLeaveAdvice(item.weddingDate);
+
+                return `
+                <article class="bg-white rounded-2xl royal-border overflow-hidden flex flex-col justify-between transition hover:shadow-xl">
+                    <div>
+                        <!-- Card Header -->
+                        <div class="bg-gradient-to-r from-amber-50 via-orange-50/40 to-amber-50 px-5 py-4 border-b border-gold/30 flex justify-between items-start gap-2">
+                            <div>
+                                <div class="flex flex-wrap items-center gap-1.5 mb-1">
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider ${houseMeta.pill}">
+                                        ${houseMeta.emoji} ${houseName} House
+                                    </span>
+                                    ${item.jnvNickname ? `
+                                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-maroon border border-gold/40">
+                                            🎒 ${escapeHtml(item.jnvNickname)}
+                                        </span>
+                                    ` : ''}
+                                </div>
+                                <h3 class="font-serif text-lg sm:text-xl font-bold text-maroon leading-snug">${escapeHtml(item.coupleName)}</h3>
+                            </div>
+                            <div class="flex items-center gap-1.5 shrink-0">
+                                ${badgeHtml}
+                                <button onclick="openWeddingForm('${escapeHtml(item.id)}')" title="Edit Wedding" class="w-8 h-8 rounded-lg bg-amber-100 text-maroon hover:bg-maroon hover:text-gold flex items-center justify-center transition">
+                                    <i class="fa-solid fa-pen-to-square text-xs"></i>
+                                </button>
+                                <button onclick="openDeleteModal('${escapeHtml(item.id)}')" title="Delete Wedding" class="w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white flex items-center justify-center transition">
+                                    <i class="fa-solid fa-trash-can text-xs"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Card Details -->
+                        <div class="p-5 space-y-3.5 text-sm">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 bg-stone-50 p-3 rounded-xl border border-stone-200/80">
+                                <div>
+                                    <p class="text-[10px] uppercase font-bold text-stone-400">Main Shaadi Date</p>
+                                    <p class="font-bold text-maroon text-sm mt-0.5">
+                                        <i class="fa-regular fa-calendar-check mr-1.5 text-gold-dark"></i>${formatIndianDate(item.weddingDate)}
+                                    </p>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] uppercase font-bold text-stone-400">Venue / City</p>
+                                    <div class="flex items-center justify-between gap-1 mt-0.5">
+                                        <p class="font-bold text-stone-800 text-sm truncate">
+                                            <i class="fa-solid fa-location-dot mr-1.5 text-maroon"></i>${escapeHtml(item.venueCity)}
+                                        </p>
+                                        <a href="${mapUrl}" target="_blank" rel="noopener noreferrer"
+                                            class="text-[11px] font-bold text-blue-700 hover:underline shrink-0 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">
+                                            <i class="fa-solid fa-map-location-dot"></i> Map
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${item.preWeddingEvents ? `
+                                <div class="bg-rose-50/70 border border-rose-200 px-3.5 py-2 rounded-xl text-xs">
+                                    <p class="text-[10px] font-extrabold uppercase text-rose-800"><i class="fa-solid fa-drum mr-1"></i> Haldi / Sangeet / Functions Schedule</p>
+                                    <p class="font-semibold text-stone-800 mt-0.5">${escapeHtml(item.preWeddingEvents)}</p>
+                                </div>
+                            ` : ''}
+
+                            <!-- Leave Planning Note & Smart Calculator -->
+                            <div class="bg-amber-50/90 border border-gold/40 px-3.5 py-2.5 rounded-xl space-y-1.5">
+                                <div class="flex items-start gap-2">
+                                    <i class="fa-solid fa-briefcase text-maroon mt-0.5"></i>
+                                    <div>
+                                        <p class="text-[10px] font-bold uppercase text-maroon">Leave & Stay Plan</p>
+                                        <p class="text-xs font-bold text-stone-800">${escapeHtml(item.leaveNote)}</p>
+                                    </div>
+                                </div>
+                                ${smartLeaveTip ? `
+                                    <div class="text-[11px] font-semibold text-maroon bg-white/80 px-2.5 py-1 rounded-lg border border-gold/30">
+                                        ${escapeHtml(smartLeaveTip)}
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <!-- Shaadi Hype / Fun Batch Reactions -->
+                            <div class="flex flex-wrap items-center justify-between gap-1.5 pt-1">
+                                <div class="flex flex-wrap items-center gap-1.5">
+                                    <button type="button" onclick="incrementReaction('${escapeHtml(item.id)}', 'naagin')"
+                                        class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-maroon border border-gold/50 transition">
+                                        🕺 Naagin Dance <span class="ml-0.5 px-1.5 py-0.2 bg-maroon text-gold rounded-full text-[10px]">${reactions.naagin || 0}</span>
+                                    </button>
+                                    <button type="button" onclick="incrementReaction('${escapeHtml(item.id)}', 'buffet')"
+                                        class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-maroon border border-gold/50 transition">
+                                        🍽️ Gulab Jamun Gang <span class="ml-0.5 px-1.5 py-0.2 bg-maroon text-gold rounded-full text-[10px]">${reactions.buffet || 0}</span>
+                                    </button>
+                                    <button type="button" onclick="incrementReaction('${escapeHtml(item.id)}', 'leave')"
+                                        class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-maroon border border-gold/50 transition">
+                                        📄 Chhutti Done <span class="ml-0.5 px-1.5 py-0.2 bg-maroon text-gold rounded-full text-[10px]">${reactions.leave || 0}</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Contact / Added By & WhatsApp Share -->
+                            <div class="flex flex-wrap items-center justify-between gap-2 text-xs text-stone-600 pt-1 border-t border-stone-100">
+                                <span><i class="fa-solid fa-phone text-gold-dark mr-1"></i><strong>Host / Contact:</strong> ${escapeHtml(item.contactBy)}</span>
+                                <button onclick="shareSingleCardOnWhatsApp('${escapeHtml(item.id)}')" class="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1 shadow-sm">
+                                    <i class="fa-brands fa-whatsapp"></i> Share Card
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Baraat Squad & Attendees Section (Bug-Free Typing + Modal Option) -->
+                    <div class="px-5 py-4 bg-stone-50 border-t border-stone-200/80 space-y-3">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs font-extrabold text-maroon">
+                                <i class="fa-solid fa-user-group mr-1"></i> Baraat Squad Attending (${attendees.length})
+                            </span>
+                            <button type="button" onclick="openRsvpModal('${escapeHtml(item.id)}')"
+                                class="text-[11px] font-bold text-maroon bg-amber-100 hover:bg-amber-200 border border-gold/60 px-2.5 py-1 rounded-lg transition">
+                                + Add with Carpool / Leave Status
+                            </button>
+                        </div>
+
+                        <!-- Attending Badges -->
+                        ${attendees.length > 0 ? `
+                            <div class="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto custom-scrollbar pr-1">
+                                ${attendees.map((att, idx) => {
+                                    const hEmoji = att.house && HOUSE_META[att.house] ? HOUSE_META[att.house].emoji : '👳‍♂️';
+                                    return `
+                                    <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-semibold bg-white border border-gold/60 text-stone-800 shadow-sm">
+                                        <span>${hEmoji} <strong class="text-maroon">${escapeHtml(att.name)}</strong></span>
+                                        ${att.status ? `<span class="text-[10px] px-1.5 py-0.5 rounded bg-amber-50 text-stone-600 border border-amber-200">${escapeHtml(att.status)}</span>` : ''}
+                                        ${att.travel ? `<span class="text-[10px] text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200"><i class="fa-solid fa-car-side mr-0.5"></i>${escapeHtml(att.travel)}</span>` : ''}
+                                        <button type="button" onclick="removeRsvpName('${escapeHtml(item.id)}', ${idx})" title="Remove name" class="text-stone-400 hover:text-red-600 font-bold ml-1">×</button>
+                                    </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        ` : `
+                            <p class="text-[11px] text-stone-400 italic">No Baraatis listed yet. Type your name below or click "+ Add with Carpool"!</p>
+                        `}
+
+                        <!-- Quick Inline Add RSVP Input (Preserves draft & pauses auto-sync while focused) -->
+                        <div class="flex flex-col sm:flex-row gap-1.5 pt-1">
+                            <select id="rsvpHouse_${escapeHtml(item.id)}"
+                                onchange="saveInlineHouseDraft('${escapeHtml(item.id)}', this.value)"
+                                class="px-2.5 py-1.5 rounded-xl border border-stone-300 focus:border-maroon outline-none text-xs font-bold bg-white sm:w-32">
+                                <option value="Aravali" ${draftHouse === 'Aravali' ? 'selected' : ''}>🟥 Aravali</option>
+                                <option value="Nilgiri" ${draftHouse === 'Nilgiri' ? 'selected' : ''}>🟦 Nilgiri</option>
+                                <option value="Shivalik" ${draftHouse === 'Shivalik' ? 'selected' : ''}>🟩 Shivalik</option>
+                                <option value="Udaigiri" ${draftHouse === 'Udaigiri' ? 'selected' : ''}>🟨 Udaigiri</option>
+                            </select>
+                            <div class="flex flex-1 gap-1.5">
+                                <input type="text"
+                                    id="rsvpInput_${escapeHtml(item.id)}"
+                                    value="${escapeHtml(draftText)}"
+                                    oninput="saveInlineDraft('${escapeHtml(item.id)}', this.value)"
+                                    placeholder="Type your name & press Enter..."
+                                    onkeydown="if(event.key==='Enter'){event.preventDefault();addQuickRsvpName('${escapeHtml(item.id)}');}"
+                                    class="flex-1 px-3 py-1.5 rounded-xl border border-stone-300 focus:border-maroon focus:ring-2 focus:ring-maroon/15 outline-none text-xs bg-white">
+                                <button type="button" onclick="addQuickRsvpName('${escapeHtml(item.id)}')"
+                                    class="px-3.5 py-1.5 rounded-xl royal-gradient text-gold font-bold text-xs shrink-0 hover:opacity-95 transition shadow-sm">
+                                    + Join
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                `;
+            }).join('');
+        }
+
+        // ============================================================================
+        // FORM ADD / EDIT HANDLERS
+        // ============================================================================
+        function openWeddingForm(editId = null) {
+            const container = document.getElementById('weddingFormContainer');
+            const form = document.getElementById('weddingForm');
+            form.reset();
+
+            if (editId && weddingsData[editId]) {
+                const w = weddingsData[editId];
+                document.getElementById('editWeddingId').value = w.id;
+                document.getElementById('formHeading').textContent = `Edit Wedding: ${w.coupleName}`;
+                document.getElementById('saveWeddingBtnText').textContent = 'Update in Live Cloud DB';
+                document.getElementById('coupleName').value = w.coupleName || '';
+                document.getElementById('jnvHouse').value = w.jnvHouse || 'Aravali';
+                document.getElementById('jnvNickname').value = w.jnvNickname || '';
+                document.getElementById('weddingDate').value = w.weddingDate || '';
+                document.getElementById('venueCity').value = w.venueCity || '';
+                document.getElementById('preWeddingEvents').value = w.preWeddingEvents || '';
+                document.getElementById('leaveNote').value = w.leaveNote || '';
+                document.getElementById('contactBy').value = w.contactBy || '';
+            } else {
+                document.getElementById('editWeddingId').value = '';
+                document.getElementById('formHeading').textContent = 'Add Upcoming Wedding Event';
+                document.getElementById('saveWeddingBtnText').textContent = 'Save to Live Cloud DB';
+            }
+
+            container.classList.remove('hidden');
+            container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function closeWeddingForm() {
+            document.getElementById('weddingFormContainer').classList.add('hidden');
+        }
+
+        document.getElementById('weddingForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('saveWeddingBtn');
+            btn.disabled = true;
+
+            const editId = document.getElementById('editWeddingId').value.trim();
+            const existing = editId ? weddingsData[editId] : null;
+            const id = editId || ('shaadi_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6));
+
+            const weddingObj = {
+                id,
+                coupleName: document.getElementById('coupleName').value.trim(),
+                jnvHouse: document.getElementById('jnvHouse').value || 'Aravali',
+                jnvNickname: document.getElementById('jnvNickname').value.trim(),
+                weddingDate: document.getElementById('weddingDate').value,
+                venueCity: document.getElementById('venueCity').value.trim(),
+                preWeddingEvents: document.getElementById('preWeddingEvents').value.trim(),
+                leaveNote: document.getElementById('leaveNote').value.trim(),
+                contactBy: document.getElementById('contactBy').value.trim(),
+                attendees: existing && Array.isArray(existing.attendees) ? existing.attendees : [],
+                reactions: existing && existing.reactions ? existing.reactions : { naagin: 0, buffet: 0, leave: 0 },
+                updatedAt: Date.now()
+            };
+
+            const ok = await saveSingleWeddingToFirebase(weddingObj);
+            btn.disabled = false;
+
+            if (ok) {
+                closeWeddingForm();
+                showToast(editId ? "Wedding updated in Live Cloud DB!" : "Wedding added to Live Cloud DB!");
+            }
+        });
+
+        // ============================================================================
+        // INLINE & MODAL RSVP HANDLERS (FIXED SO INPUT NEVER DISAPPEARS)
+        // ============================================================================
+        async function addQuickRsvpName(weddingId) {
+            const input = document.getElementById(`rsvpInput_${weddingId}`);
+            const houseSel = document.getElementById(`rsvpHouse_${weddingId}`);
+            const rawName = (input ? input.value : (draftInputs[weddingId] || '')).trim();
+
+            if (!rawName) {
+                if (input) input.focus();
+                return;
+            }
+
+            const target = weddingsData[weddingId];
+            if (!target) return;
+
+            const house = houseSel ? houseSel.value : (draftHouseInputs[weddingId] || 'Aravali');
+            const newAttendee = {
+                name: rawName,
+                house,
+                status: 'Pakka Joining 🔥',
+                travel: ''
+            };
+
+            const updatedAttendees = Array.isArray(target.attendees) ? [...target.attendees, newAttendee] : [newAttendee];
+            const updatedObj = { ...target, attendees: updatedAttendees, updatedAt: Date.now() };
+
+            // Clear saved draft for this wedding card
+            draftInputs[weddingId] = '';
+            if (input) input.value = '';
+
+            const ok = await saveSingleWeddingToFirebase(updatedObj);
+            if (ok) {
+                showToast(`👳‍♂️ ${rawName} (${house}) added to Baraat Squad!`);
+            }
+        }
+
+        function openRsvpModal(weddingId) {
+            const w = weddingsData[weddingId];
+            if (!w) return;
+            document.getElementById('rsvpModalWeddingId').value = weddingId;
+            document.getElementById('rsvpModalTitle').textContent = `Baraat for ${w.coupleName}`;
+            document.getElementById('rsvpModalName').value = draftInputs[weddingId] || '';
+            document.getElementById('rsvpModalHouse').value = draftHouseInputs[weddingId] || w.jnvHouse || 'Aravali';
+            document.getElementById('rsvpModalStatus').value = 'Pakka Joining 🔥';
+            document.getElementById('rsvpModalTravel').value = '';
+
+            const modal = document.getElementById('rsvpModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => document.getElementById('rsvpModalName').focus(), 50);
+        }
+
+        function closeRsvpModal() {
+            const modal = document.getElementById('rsvpModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.getElementById('rsvpModalForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const weddingId = document.getElementById('rsvpModalWeddingId').value;
+            const name = document.getElementById('rsvpModalName').value.trim();
+            const house = document.getElementById('rsvpModalHouse').value;
+            const status = document.getElementById('rsvpModalStatus').value;
+            const travel = document.getElementById('rsvpModalTravel').value.trim();
+
+            if (!weddingId || !name || !weddingsData[weddingId]) return;
+
+            const btn = document.getElementById('rsvpModalSubmitBtn');
+            btn.disabled = true;
+
+            const target = weddingsData[weddingId];
+            const newAttendee = { name, house, status, travel };
+            const updatedAttendees = Array.isArray(target.attendees) ? [...target.attendees, newAttendee] : [newAttendee];
+            const updatedObj = { ...target, attendees: updatedAttendees, updatedAt: Date.now() };
+
+            draftInputs[weddingId] = '';
+            const ok = await saveSingleWeddingToFirebase(updatedObj);
+            btn.disabled = false;
+
+            if (ok) {
+                closeRsvpModal();
+                showToast(`🎉 ${name} added to Baraat Squad!`);
+            }
+        });
+
+        async function removeRsvpName(weddingId, idx) {
+            const target = weddingsData[weddingId];
+            if (!target || !Array.isArray(target.attendees)) return;
+
+            const updatedAttendees = target.attendees.filter((_, i) => i !== idx);
+            const updatedObj = { ...target, attendees: updatedAttendees, updatedAt: Date.now() };
+
+            const ok = await saveSingleWeddingToFirebase(updatedObj);
+            if (ok) {
+                showToast("Removed from attending list.");
+            }
+        }
+
+        // ============================================================================
+        // FUN REACTIONS / SHAADI HYPE COUNTER
+        // ============================================================================
+        async function incrementReaction(weddingId, type) {
+            const target = weddingsData[weddingId];
+            if (!target) return;
+
+            const currentReactions = target.reactions || { naagin: 0, buffet: 0, leave: 0 };
+            const updatedReactions = {
+                ...currentReactions,
+                [type]: Number(currentReactions[type] || 0) + 1
+            };
+
+            const updatedObj = {
+                ...target,
+                reactions: updatedReactions,
+                updatedAt: Date.now()
+            };
+
+            await saveSingleWeddingToFirebase(updatedObj);
+        }
+
+        // ============================================================================
+        // DELETE MODAL HANDLERS
+        // ============================================================================
+        function openDeleteModal(weddingId) {
+            pendingDeleteId = weddingId;
+            const modal = document.getElementById('deleteModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeDeleteModal() {
+            pendingDeleteId = null;
+            const modal = document.getElementById('deleteModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+            if (!pendingDeleteId) return;
+            const id = pendingDeleteId;
+            closeDeleteModal();
+            const ok = await deleteSingleWeddingFromFirebase(id);
+            if (ok) {
+                showToast("Wedding permanently deleted from Cloud DB!");
+            }
+        });
+
+        // ============================================================================
+        // WHATSAPP SHARING
+        // ============================================================================
+        function shareSingleCardOnWhatsApp(weddingId) {
+            const w = weddingsData[weddingId];
+            if (!w) return;
+            const d = getDaysDifference(w.weddingDate);
+            const countStr = d === 0 ? "TODAY!" : (d > 0 ? `in ${d} days` : `Completed`);
+            const houseEmoji = w.jnvHouse && HOUSE_META[w.jnvHouse] ? HOUSE_META[w.jnvHouse].emoji : '🏠';
+            const attList = (w.attendees || []).map(a => {
+                const obj = normalizeAttendee(a);
+                return obj ? `${obj.name}${obj.travel ? ` (${obj.travel})` : ''}` : '';
+            }).filter(Boolean);
+
+            const lines = [
+                `🎺 *JNV GAJNER (BIKANER) 2016 BATCH SHAADI ALERT* 🎺`,
+                `────────────────────`,
+                `💍 *Wedding:* ${w.coupleName} (${countStr})`,
+                `${houseEmoji} *House:* ${w.jnvHouse || 'Aravali'} House ${w.jnvNickname ? `(${w.jnvNickname})` : ''}`,
+                `📅 *Main Date:* ${formatIndianDate(w.weddingDate)}`,
+                w.preWeddingEvents ? `🥁 *Functions:* ${w.preWeddingEvents}` : null,
+                `📍 *Venue:* ${w.venueCity}`,
+                `🧳 *Leave Plan:* ${w.leaveNote}`,
+                `📞 *Contact:* ${w.contactBy}`,
+                attList.length > 0 ? `👳‍♂️ *Baraat Squad (${attList.length}):* ${attList.join(', ')}` : null,
+                `────────────────────`,
+                `✅ *Add your name & carpool plan on our JNV 2016 Shaadi Tracker link!*`
+            ].filter(Boolean);
+
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+        }
+
+        function shareFullListOnWhatsApp() {
+            const upcoming = Object.values(weddingsData)
+                .filter(w => getDaysDifference(w.weddingDate) >= 0)
+                .sort((a, b) => new Date(a.weddingDate) - new Date(b.weddingDate));
+
+            const lines = [
+                `💍 *JNV GAJNER (BIKANER) • 2016 BATCH* 💍`,
+                `📅 *Upcoming Shaadi & Baraat Leave Calendar*`,
+                `────────────────────`
+            ];
+
+            if (upcoming.length === 0) {
+                lines.push(`No upcoming weddings listed right now! Open our live tracker to add upcoming dates.`);
+            } else {
+                upcoming.forEach((w, idx) => {
+                    const d = getDaysDifference(w.weddingDate);
+                    const countStr = d === 0 ? "TODAY!" : `in ${d} days`;
+                    const houseEmoji = w.jnvHouse && HOUSE_META[w.jnvHouse] ? HOUSE_META[w.jnvHouse].emoji : '';
+                    const attNames = (w.attendees || []).map(a => normalizeAttendee(a)?.name).filter(Boolean);
+
+                    lines.push(`*${idx + 1}. ${w.coupleName}* ${houseEmoji} (${countStr})`);
+                    lines.push(`📅 *Date:* ${formatIndianDate(w.weddingDate)} | 📍 *Venue:* ${w.venueCity}`);
+                    lines.push(`🧳 *Leave:* ${w.leaveNote}`);
+                    if (attNames.length > 0) {
+                        lines.push(`👳‍♂️ *Baraatis (${attNames.length}):* ${attNames.join(', ')}`);
+                    }
+                    lines.push(`────────────────────`);
+                });
+            }
+
+            lines.push(`✅ *Check dates, plan carpools & mark your RSVP on our live batch link!*`);
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
+        }
+
+        // ============================================================================
+        // STARTUP & SMART AUTO-POLLING (EVERY 5 SECONDS, NEVER INTERRUPTS TYPING)
+        // ============================================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchWeddingsFromFirebase(false, true);
+            setInterval(() => fetchWeddingsFromFirebase(true, false), 5000);
+        });
+    </script>
+</body>
+</html>
